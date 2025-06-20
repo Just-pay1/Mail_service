@@ -1,6 +1,6 @@
 import amqp, { Channel, ChannelModel, ConsumeMessage } from "amqplib";
-import { RABBITMQ_IP, MAILS_QUEUE, RABBITMQ_PORT, RABBITMQ_PASSWORD, RABBITMQ_USERNAME} from "../config/variables";
-import sendEmail from "../utils/mail";
+import { RABBITMQ_IP, MAILS_QUEUE, RABBITMQ_PORT, RABBITMQ_PASSWORD, RABBITMQ_USERNAME } from "../config/variables";
+import sendEmail, { EmailRequest } from "../utils/mail";
 
 
 class RabbitMQ {
@@ -42,28 +42,21 @@ class RabbitMQ {
     }
   }
 
-  public async sendMail(message: object) {
-    await this.mailChannel?.sendToQueue(MAILS_QUEUE!, Buffer.from(JSON.stringify(message)))
-  }
-
-  public async startMailConsumer() {
-    if (!this.mailChannel) throw new Error('Mail channel not initialized.');
-  
-    await this.mailChannel.assertQueue(MAILS_QUEUE);
-  
-    this.mailChannel.consume(MAILS_QUEUE, async(msg) => {
+  public async consumeFromMailsQueue(){
+    console.log(`== Started to consume from ${MAILS_QUEUE} ==`)
+    await this.mailChannel?.consume(MAILS_QUEUE!, async (msg: ConsumeMessage | null) => {
       if (msg) {
-        const { to, subject, content } = JSON.parse(msg.content.toString());
-        try {
-          await sendEmail({ to, subject, content });
-          this.mailChannel.ack(msg);
-        } catch (error) {
-          console.error('Failed to send email from consumer:', error);
+        const data = JSON.parse(msg.content.toString());
+        const mailObj: EmailRequest = {
+          to: data.to,
+          subject: data.subject,
+          content: data.content
         }
+        const ack = await sendEmail(mailObj);
+        ack ? this.mailChannel?.ack(msg) : this.mailChannel?.nack(msg);
       }
-    });
-  
-    console.log('Waiting for email jobs...');
+    })
+
   }
 }
 

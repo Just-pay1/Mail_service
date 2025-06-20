@@ -1,9 +1,13 @@
 import express, { Express } from 'express';
-const app: Express = express();
-import * as dotenv from 'dotenv';
-dotenv.config();
-const PORT: number = 3000;
+import { PORT } from './config/variables';
+import RabbitMQ from './Rabbit/rabbit';
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${process.env.PORT || PORT}`);
+
+const app: Express = express();
+const port = PORT || 4000
+
+const server = app.listen(port, async () => {
+  console.log(`Listening on ${port}`);
+  const rabbitMQ = await RabbitMQ.getInstance();
+  rabbitMQ.consumeFromMailsQueue();
 });

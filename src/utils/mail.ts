@@ -4,18 +4,14 @@ import path from 'path';
 import handlebars from 'handlebars';
 import transporter from './transporter';
 
-interface EmailRequest {
+export interface EmailRequest {
   to: string;
   subject: string;
   content: string;
 }
 
-async function sendEmail(req: EmailRequest): Promise<{ message: string, error?: string }> {
+async function sendEmail(req: EmailRequest){
   const { to, subject, content } = req;
-
-  if (!to || !subject || !content) {
-    return { message: 'Missing required fields' };
-  }
 
   try {
     const templatePath = path.join(__dirname, '..', '..', 'templates', 'email.html');
@@ -29,11 +25,12 @@ async function sendEmail(req: EmailRequest): Promise<{ message: string, error?: 
       subject,
       html: htmlContent
     });
+    console.log(`Email sent to ${to} with subject "${subject}"`);
 
-    return { message: 'Email sent successfully' };
+    return true
   } catch (err) {
-    console.error('Error:', err);
-    return { message: 'Failed to send email', error: (err as Error).message };
+    console.log('Error:', err);
+    return false
   }
 }
 

@@ -3,6 +3,7 @@ dotenv.config();
 
 
 // RABBITMQ 
+export const PORT = process.env.PORT;
 export const RABBITMQ_IP = process.env.RABBITMQ_IP;
 export const RABBITMQ_PORT = process.env.RABBITMQ_PORT;
 export const RABBITMQ_USERNAME = process.env.RABBITMQ_USERNAME;

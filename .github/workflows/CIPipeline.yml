@@ -1,0 +1,41 @@
+name: Build and Push Docker Image of mail service
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Login to Azure Container Registry
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ secrets.ACR_USERNAME_AKS }}.azurecr.io
+        username: ${{ secrets.ACR_USERNAME_AKS }}
+        password: ${{ secrets.ACR_PASSWORD_AKS }}
+
+    - name: Build Docker image
+      run: |
+        docker build  \
+             --build-arg DB_NAME_REMOTE="${{ secrets.EMAIL_USER }}" \
+             --build-arg DB_USER_REMOTE="${{ secrets.APP_PASS }}" \
+             --build-arg DB_PASSWORD_REMOTE="${{ secrets.PORT }}" \
+             --build-arg DB_HOST_REMOTE="${{ secrets.RABBITMQ_IP }}" \
+             --build-arg DB_DIALECT_REMOTE="${{ secrets.RABBITMQ_PORT }}" \
+             --build-arg DB_PORT_REMOTE="${{ secrets.RABBITMQ_USERNAME }}" \
+             --build-arg JWT_ACCESS_SECRET="${{ secrets.RABBITMQ_PASSWORD }}" \
+             --build-arg JWT_REFRESH_SECRET="${{ secrets.MAILS_QUEUE }}" \
+             -t mail .
+
+    - name: Tag Docker image
+      run: |
+        docker tag mail ${{ secrets.ACR_USERNAME_AKS }}.azurecr.io/mail:latest
+
+    - name: Push Docker image to Azure Container Registry
+      run: |
+        docker push ${{ secrets.ACR_USERNAME_AKS }}.azurecr.io/mail:latest

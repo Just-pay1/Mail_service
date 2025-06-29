@@ -19,6 +19,14 @@ jobs:
         username: ${{ secrets.ACR_USERNAME_AKS }}
         password: ${{ secrets.ACR_PASSWORD_AKS }}
 
+    
+    - name: Login to Azure Container Registry of maher
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ secrets.ACR_USERNAME }}.azurecr.io
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}    
+
     - name: Build Docker image
       run: |
         docker build  \
@@ -36,6 +44,16 @@ jobs:
       run: |
         docker tag mail ${{ secrets.ACR_USERNAME_AKS }}.azurecr.io/mail:latest
 
+    - name: Tag Docker image
+      run: |
+        docker tag mail ${{ secrets.ACR_USERNAME }}.azurecr.io/mail:latest  
+
+
     - name: Push Docker image to Azure Container Registry
       run: |
         docker push ${{ secrets.ACR_USERNAME_AKS }}.azurecr.io/mail:latest
+
+
+    - name: Push Docker image to Azure Container Registry
+      run: |
+        docker push ${{ secrets.ACR_USERNAME }}.azurecr.io/mail:latest

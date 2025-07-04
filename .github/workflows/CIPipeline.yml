@@ -30,14 +30,14 @@ jobs:
     - name: Build Docker image
       run: |
         docker build  \
-             --build-arg DB_NAME_REMOTE="${{ secrets.EMAIL_USER }}" \
-             --build-arg DB_USER_REMOTE="${{ secrets.APP_PASS }}" \
-             --build-arg DB_PASSWORD_REMOTE="${{ secrets.PORT }}" \
-             --build-arg DB_HOST_REMOTE="${{ secrets.RABBITMQ_IP }}" \
-             --build-arg DB_DIALECT_REMOTE="${{ secrets.RABBITMQ_PORT }}" \
-             --build-arg DB_PORT_REMOTE="${{ secrets.RABBITMQ_USERNAME }}" \
-             --build-arg JWT_ACCESS_SECRET="${{ secrets.RABBITMQ_PASSWORD }}" \
-             --build-arg JWT_REFRESH_SECRET="${{ secrets.MAILS_QUEUE }}" \
+             --build-arg EMAIL_USER="${{ secrets.EMAIL_USER }}" \
+             --build-arg APP_PASS="${{ secrets.APP_PASS }}" \
+             --build-arg PORT="${{ secrets.PORT }}" \
+             --build-arg RABBITMQ_IP="${{ secrets.RABBITMQ_IP }}" \
+             --build-arg RABBITMQ_PORT="${{ secrets.RABBITMQ_PORT }}" \
+             --build-arg RABBITMQ_USERNAME="${{ secrets.RABBITMQ_USERNAME }}" \
+             --build-arg RABBITMQ_PASSWORD="${{ secrets.RABBITMQ_PASSWORD }}" \
+             --build-arg MAILS_QUEUE="${{ secrets.MAILS_QUEUE }}" \
              -t mail .
 
     - name: Tag Docker image

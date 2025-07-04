@@ -35,4 +35,4 @@ RUN tsc
 
 EXPOSE 5200
 
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "serve"]

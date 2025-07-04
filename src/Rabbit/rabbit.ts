@@ -20,9 +20,10 @@ class RabbitMQ {
 
   private async init(): Promise<void> {
     try {
+      console.log(RABBITMQ_IP)
       this.connection = await amqp.connect({
         protocol: 'amqps',
-        hostname: RABBITMQ_IP || 'localhost',
+        hostname: RABBITMQ_IP,
         port: Number(RABBITMQ_PORT) || 5672,
         username: RABBITMQ_USERNAME,
         password: RABBITMQ_PASSWORD,

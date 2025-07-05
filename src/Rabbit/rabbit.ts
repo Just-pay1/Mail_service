@@ -20,7 +20,8 @@ class RabbitMQ {
 
   private async init(): Promise<void> {
     try {
-      console.log(RABBITMQ_IP)
+      console.log(`Connecting to RabbitMQ at ${RABBITMQ_IP}:${RABBITMQ_PORT}`);
+
       this.connection = await amqp.connect({
         protocol: 'amqps',
         hostname: RABBITMQ_IP,
@@ -28,7 +29,19 @@ class RabbitMQ {
         username: RABBITMQ_USERNAME,
         password: RABBITMQ_PASSWORD,
         vhost: RABBITMQ_USERNAME,
-        frameMax: 8192 // Ensure this is at least 8192
+        frameMax: 8192, // Ensure this is at least 8192
+        heartbeat: 60,
+      });
+
+      // logs for errors 
+      this.connection.on("error", (err) => {
+        console.log("RabbitMQ connection error:", err.message);
+      });
+
+      // reconnect 
+      this.connection.on("close", () => {
+        console.warn("RabbitMQ connection closed. Attempting to reconnect...");
+        setTimeout(() => this.init(), 5000);
       });
 
       this.mailChannel = await this.connection.createChannel();
